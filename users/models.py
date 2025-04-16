@@ -12,30 +12,30 @@ class User(AbstractUser):
 
     email = models.EmailField(
         unique=True,
-        verbose_name="Электронная почта",
-        help_text="Укажите вашу электронную почту"
+        verbose_name='Электронная почта',
+        help_text='Укажите вашу электронную почту'
     )
     first_name = models.CharField(
         max_length=50,
-        verbose_name="Имя пользователя",
-        help_text="Укажите имя"
+        verbose_name='Имя пользователя',
+        help_text='Укажите имя'
     )
     last_name = models.CharField(
         max_length=150,
-        verbose_name="Фамилия пользователя",
-        help_text="Укажите фамилию"
+        verbose_name='Фамилия пользователя',
+        help_text='Укажите фамилию'
     )
     phone = models.CharField(
         max_length=35,
         **NULLABLE,
-        verbose_name="Номер телефона",
-        help_text="Укажите ваш номер телефона"
+        verbose_name='Номер телефона',
+        help_text='Укажите ваш номер телефона'
     )
 
 
-    USERNAME_FIELD = "email"
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
