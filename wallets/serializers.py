@@ -27,4 +27,4 @@ class WalletSerializer(ModelSerializer):
     """
     class Meta:
         model = Wallet
-        fields = ['uuid', 'balance']
+        fields = ('uuid', 'balance')
