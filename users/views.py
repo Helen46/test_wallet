@@ -34,7 +34,7 @@ class UserRetrieveApiView(RetrieveAPIView):
     Просмотр пользователя
     """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailSerializer
     permission_classes = (IsYourObject,)
 
 
@@ -43,7 +43,7 @@ class UserUpdateApiView(UpdateAPIView):
     Изменение пользователя
     """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailSerializer
     permission_classes = (IsYourObject,)
 
 
@@ -52,5 +52,5 @@ class UserDestroyApiView(DestroyAPIView):
     Удаление пользователя
     """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailSerializer
     permission_classes = (IsYourObject,)
