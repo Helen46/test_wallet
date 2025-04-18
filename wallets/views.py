@@ -3,18 +3,29 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from django.db import transaction
+from django.db import transaction, IntegrityError
 
 from wallets.models import Wallet, Operation
-from wallets.serializers import OperationSerializer, WalletSerializer
+from wallets.serializers import OperationSerializer, WalletSerializer, WalletCreateSerializer
 
 
 class WalletCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        wallet = Wallet.objects.create(owner=request.user)
-        return Response({'uuid': wallet.uuid}, status=201)
+        serializer = WalletCreateSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            try:
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except IntegrityError as e:
+                if 'wallets_wallet_owner_id_key' in str(e):
+                    return Response(
+                        {"detail": "У пользователя уже есть кошелек."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                raise
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class WalletOperationView(APIView):

@@ -5,4 +5,4 @@ from wallets.models import Wallet
 
 @admin.register(Wallet)
 class WalletAdmin(admin.ModelAdmin):
-    list_display = ('uuid', 'balance',)
+    list_display = ('owner', 'balance',)
