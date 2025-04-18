@@ -1,3 +1,4 @@
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -29,26 +30,31 @@ class WalletCreateView(APIView):
 
 
 class WalletOperationView(APIView):
+
     def post(self, request, wallet_uuid):
         wallet = get_object_or_404(Wallet, uuid=wallet_uuid)
         serializer = OperationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        op_type = serializer.validated_data['operation_type']
-        amount = serializer.validated_data['amount']
 
-        with transaction.atomic():
-            if op_type == Operation.DEPOSIT:
-                wallet.balance += amount
-            elif op_type == Operation.WITHDRAW:
-                if wallet.balance < amount:
-                    return Response({'error': 'Insufficient funds'}, status=status.HTTP_400_BAD_REQUEST)
-                wallet.balance -= amount
-            wallet.save()
-            Operation.objects.create(wallet=wallet, operation_type=op_type, amount=amount)
-        return Response({'balance': wallet.balance}, status=status.HTTP_200_OK)
+        try:
+            # Вся логика внутри модели
+            wallet.update_balance(
+                operation_type=serializer.validated_data['operation_type'],
+                amount=serializer.validated_data['amount']
+            )
+            # Логирование операции
+            Operation.objects.create(
+                wallet=wallet,
+                operation_type=serializer.validated_data['operation_type'],
+                amount=serializer.validated_data['amount']
+            )
+            return Response({'balance': wallet.balance}, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class WalletDetailView(APIView):
+class WalletRetrieveView(APIView):
+
     def get(self, request, wallet_uuid):
         wallet = get_object_or_404(Wallet, uuid=wallet_uuid)
         serializer = WalletSerializer(wallet)

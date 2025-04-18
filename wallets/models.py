@@ -1,5 +1,9 @@
 import uuid
-from django.db import models
+from decimal import Decimal
+
+from django.db import models, transaction
+from django.db.models import F
+from rest_framework.exceptions import ValidationError
 
 from config.settings import AUTH_USER_MODEL
 
@@ -26,6 +30,25 @@ class Wallet(models.Model):
         related_name='wallet',
         verbose_name='Владелец кошелька'
     )
+
+    @transaction.atomic
+    def update_balance(self, operation_type: str, amount: Decimal):
+        """Обновление баланса с проверкой типа операции"""
+        # Блокировка записи
+        wallet = Wallet.objects.select_for_update().get(pk=self.pk)
+
+        # Проверка для списания
+        if operation_type == 'WITHDRAW' and wallet.balance < amount:
+            raise ValidationError('Недостаточно средств')
+
+        # Определение дельты
+        delta = amount if operation_type == 'DEPOSIT' else -amount
+
+        # Атомарное обновление
+        Wallet.objects.filter(pk=self.pk).update(
+            balance=F('balance') + delta
+        )
+        self.refresh_from_db()
 
     class Meta:
         verbose_name = 'Кошелек'

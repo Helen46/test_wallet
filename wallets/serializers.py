@@ -35,7 +35,7 @@ class WalletSerializer(ModelSerializer):
 class WalletCreateSerializer(ModelSerializer):
     class Meta:
         model = Wallet
-        fields = ['uuid', 'balance']
+        fields = ('uuid', 'balance')
 
     def create(self, validated_data):
         # Добавляем текущего пользователя в данные для сохранения
