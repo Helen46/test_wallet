@@ -1,9 +1,9 @@
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 
-from wallets.models import Wallet, Operation
+from wallets.models import Wallet
 from users.models import User
 
 
