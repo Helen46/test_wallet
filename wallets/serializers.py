@@ -1,26 +1,24 @@
-from decimal import Decimal
-
 from rest_framework import serializers
-from rest_framework.fields import ChoiceField, DecimalField
 from rest_framework.serializers import ModelSerializer
 
 from wallets.models import Operation, Wallet
 
 
-class OperationSerializer(serializers.Serializer):
+class OperationSerializer(ModelSerializer):
     """
     Сериализатор для операций
     """
-    # дополнительная валидация для поля operation_type
-    operation_type = ChoiceField(
-        choices=Operation.OPERATION_TYPES
-    )
-    # дополнительная валидация для поля amount и добавление минимального значения
-    amount = DecimalField(
-        max_digits=20,
-        decimal_places=2,
-        min_value=Decimal('0.01')
-    )
+    class Meta:
+        model = Operation
+        fields = ['operation_type', 'amount']
+
+    def validate_amount(self, value):
+        """
+        Базовая проверка: сумма > 0 для всех операций
+        """
+        if value <= 0:
+            raise serializers.ValidationError("Сумма должна быть положительной")
+        return value
 
 
 class WalletSerializer(ModelSerializer):
@@ -29,7 +27,7 @@ class WalletSerializer(ModelSerializer):
     """
     class Meta:
         model = Wallet
-        fields = ('uuid', 'balance')
+        fields = ('uuid', 'balance', 'owner')
 
 
 class WalletCreateSerializer(ModelSerializer):
