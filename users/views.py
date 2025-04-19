@@ -25,7 +25,7 @@ class UserListApiView(ListAPIView):
     Список пользователей
     """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailSerializer
     permission_classes = (IsAdmin,)
 
 
