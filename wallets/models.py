@@ -33,7 +33,9 @@ class Wallet(models.Model):
 
     @transaction.atomic
     def update_balance(self, operation_type: str, amount: Decimal):
-        """Обновление баланса с проверкой типа операции"""
+        """
+        Обновление баланса с проверкой типа операции
+        """
         # Блокировка записи
         wallet = Wallet.objects.select_for_update().get(pk=self.pk)
 
